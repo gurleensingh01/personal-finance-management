@@ -35,10 +35,13 @@ export default function Page() {
       </div>
 
       <div className="m-auto text-center">
+
         <p className="text-white text-5xl mb-8">Personal Finance Management</p>
+
         <p className="text-2xl m-3">
-                Welcome, {user.displayName}. Let's manage your finances.
-              </p>
+          Welcome, {user.displayName}. Let&apos;s manage your finances.
+        </p>
+
         <div className="border-4 border-white p-5 rounded-full w-96 mx-auto">
           <label
             className="block text-white text-2xl font-semibold mb-2"
@@ -62,8 +65,11 @@ export default function Page() {
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
           </select>
+          
         </div>
+
       </div>
+
     </div>
   );
 }
