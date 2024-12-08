@@ -7,7 +7,7 @@ export default function Page() {
 
         <div className="m-auto text-center">
           <p className="text-white text-5xl mb-8">Personal Finance Management</p>
-          <p className='text-3xl'>Begin your finance <Link className="hover:underline hover:cursor-pointer" href="/personal-finance-management">now</Link>
+          <p className="text-3xl">Begin your finance <Link className="hover:underline hover:cursor-pointer" href="/personal-finance-management">now</Link>
           </p>
         </div>
         
