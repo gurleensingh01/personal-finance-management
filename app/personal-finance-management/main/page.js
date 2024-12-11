@@ -32,8 +32,7 @@ export default function Page() {
     updateTotalInvestment(); // Updates the total investment
     updateTotalIncome(); // Updates the total income
     updateTotalExpenses(); // Updates the total expenses
-    updateTotalSavings(); // Updates the total savings
-  }, [updateTotalInvestment, updateTotalIncome, updateTotalExpenses, updateTotalSavings]);
+  }, [updateTotalInvestment, updateTotalIncome, updateTotalExpenses]);
 
   // Data for Pie Charts
   const incomeVsExpensesData = {
@@ -162,8 +161,8 @@ export default function Page() {
 
         {/* Reports Section */}
         <section className="mt-12">
-          <h3 className="text-3xl mb-4">Reports</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <h3 className="text-3xl mb-4 text-center">Reports</h3>
+          <div className="flex flex-wrap justify-center items-center gap-6">
             {/* Income vs Expenses Pie Chart */}
             <div className="bg-gray-700 p-6 rounded-lg shadow-lg text-center">
               <h4 className="text-2xl mb-4">Income vs Expenses</h4>
@@ -177,6 +176,7 @@ export default function Page() {
             </div>
           </div>
         </section>
+
       </main>
     </div>
   );

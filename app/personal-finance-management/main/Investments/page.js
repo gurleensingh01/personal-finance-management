@@ -165,7 +165,7 @@ export default function InvestmentsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen bg-gradient-to-br from-gray-800 to-black text-white font-serif">
+    <div className="flex flex-col items-center bg-gradient-to-br from-gray-800 to-black text-white font-serif">
       {/* Header */}
       <header className="bg-gray-900 py-4 px-6 w-full shadow-md flex justify-between items-center">
         <h1 className="text-3xl font-semibold">Investment</h1>
@@ -223,11 +223,8 @@ export default function InvestmentsPage() {
       {/* Pie Chart */}
       <div className="mx-auto py-6">
         <h2 className="text-2xl font-bold text-center mb-4">Investments Distribution</h2>
-        <div className="bg-gray-700 p-6 rounded-lg shadow-lg flex justify-center">
-          {/* Wrapper div to control size */}
-          <div className="m-5 p-5" style={{ width: '300px', height: '300px' }}>
-            <Pie data={pieData} />
-          </div>
+        <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
+          <Pie data={pieData} />
         </div>
       </div>
 
