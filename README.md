@@ -1,24 +1,5 @@
 Personal Finance Management
 
-- Structure breakdown:
+In order to make the pie charts work on our web app, the following command is needed:
 
-/personal-finance-management
-├── /main
-│ ├── page.js (Main Dashboard - Post-login entry point)
-│ ├── /Profile
-│ ├── page.js (Handles both CreateProfile and EditProfile functionality)
-│ ├── /Savings
-│ ├── page.js (Savings screen)
-│ ├── /Income
-│ ├── page.js (Income screen)
-│ ├── /Expenses
-│ ├── page.js (Expenses screen)
-│ ├── /Investments
-│ ├── page.js (Investments screen)
-│
-├── /\_utils
-│ ├── auth-context.js (Manages authentication and user state)
-│ ├── firebase.js (Firebase setup and configuration)
-│
-├── page.js (Login Page - Handles Google Sign-In)
-├── layout.js (Wraps all pages with Auth Context)
+npm install chart.js react-chartjs-2 --legacy-peer-deps
