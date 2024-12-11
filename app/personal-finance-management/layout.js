@@ -27,7 +27,7 @@ export default function Layout({ children }) {
                 <main className="flex-grow">{children}</main>
 
                 {/* Footer */}
-                <footer className="bg-gray-800 text-white py-2 text-center">
+                <footer className="bg-gray-800 text-white py-2 text-center mb-auto">
                   <p>
                     &copy; {new Date().getFullYear()} Personal Finance
                     Management. All rights reserved.

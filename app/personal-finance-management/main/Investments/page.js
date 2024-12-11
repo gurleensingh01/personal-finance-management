@@ -169,37 +169,6 @@ export default function InvestmentsPage() {
       {/* Header */}
       <header className="bg-gray-900 py-4 px-6 w-full shadow-md flex justify-between items-center">
         <h1 className="text-3xl font-semibold">Investment</h1>
-        <div className="relative">
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="bg-gray-700 px-3 py-2 rounded-md focus:outline-none hover:bg-gray-600"
-          >
-            ☰
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  router.push("/personal-finance-management/main/Profile");
-                }}
-                className="block px-4 py-2 hover:bg-gray-700"
-              >
-                Profile
-              </button>
-              <button
-                onClick={() => {
-                  firebaseSignOut();
-                  router.push("/personal-finance-management");
-                }}
-                className="block px-4 py-2 text-red-500 hover:bg-gray-700"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
       </header>
 
       {/* Total Investments Summary */}
