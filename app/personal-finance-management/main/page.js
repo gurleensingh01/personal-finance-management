@@ -4,6 +4,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useUserAuth } from "../_utils/auth-context.js";
 import { useInvestment } from "../_utils/investment-context"; // Investment context
 import { useIncome } from "../_utils/income-context"; // Income context
+import { useExpenses } from "../_utils/expenses-context"; // Expenses context
+import { useSavings } from "../_utils/savings-context"; // Savings context
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -13,10 +15,10 @@ export default function Page() {
   const { user, firebaseSignOut } = useUserAuth();
   const { updateTotalInvestment, totalInvestment } = useInvestment(); // Investment data
   const { updateTotalIncome, totalIncome } = useIncome(); // Income data
+  const { updateTotalExpenses, totalExpenses } = useExpenses(); // Expenses data
+  const { updateTotalSavings, totalSavings } = useSavings(); // Savings data
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false); // State to control the hamburger menu
-  const [expenses, setExpenses] = useState(0); // Placeholder for expenses
-  const [savings, setSavings] = useState(0); // Placeholder for savings
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Redirect unauthenticated users to the login page
   useEffect(() => {
@@ -25,22 +27,20 @@ export default function Page() {
     }
   }, [user, router]);
 
-  // Fetch total investments dynamically
+  // Fetch dynamic data
   useEffect(() => {
-    updateTotalInvestment(); // Updates the total investment whenever called
-  }, [updateTotalInvestment]);
-
-  // Fetch total income dynamically
-  useEffect(() => {
-    updateTotalIncome(); // Updates the total income whenever called
-  }, [updateTotalIncome]);
+    updateTotalInvestment(); // Updates the total investment
+    updateTotalIncome(); // Updates the total income
+    updateTotalExpenses(); // Updates the total expenses
+    updateTotalSavings(); // Updates the total savings
+  }, [updateTotalInvestment, updateTotalIncome, updateTotalExpenses, updateTotalSavings]);
 
   // Data for Pie Charts
   const incomeVsExpensesData = {
     labels: ["Income", "Expenses"],
     datasets: [
       {
-        data: [totalIncome || 0, expenses || 0],
+        data: [totalIncome || 0, totalExpenses || 0],
         backgroundColor: ["#4caf50", "#f44336"],
         hoverBackgroundColor: ["#66bb6a", "#e57373"],
       },
@@ -51,7 +51,7 @@ export default function Page() {
     labels: ["Savings", "Expenses", "Investments"],
     datasets: [
       {
-        data: [savings || 0, expenses || 0, totalInvestment || 0],
+        data: [totalSavings || 0, totalExpenses || 0, totalInvestment || 0],
         backgroundColor: ["#2196f3", "#ff9800", "#9c27b0"],
         hoverBackgroundColor: ["#42a5f5", "#ffb74d", "#ba68c8"],
       },
@@ -126,7 +126,7 @@ export default function Page() {
           {/* Total Expenses */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Expenses</h3>
-            <p className="text-xl">${expenses.toFixed(2)}</p>
+            <p className="text-xl">${totalExpenses.toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Expenses")}
               className="text-blue-400 hover:underline mt-2"
@@ -138,7 +138,7 @@ export default function Page() {
           {/* Total Savings */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Savings</h3>
-            <p className="text-xl">${savings.toFixed(2)}</p>
+            <p className="text-xl">${totalSavings.toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Savings")}
               className="text-blue-400 hover:underline mt-2"
