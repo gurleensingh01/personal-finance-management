@@ -93,7 +93,7 @@ export default function Page() {
               <button
                 onClick={() => {
                   setMenuOpen(false);
-                  router.push("/main/Profile");
+                  router.push("/personal-finance-management/main/Profile");
                 }}
                 className="block px-4 py-2 hover:bg-gray-700"
               >
@@ -137,7 +137,7 @@ export default function Page() {
             <h3 className="text-2xl font-semibold mb-4">Total Expenses</h3>
             <p className="text-xl">${expenses !== null ? expenses.toFixed(2) : "N/A"}</p>
             <button
-              onClick={() => router.push("/main/Expenses")}
+              onClick={() => router.push("/personal-finance-management/main/Expenses")}
               className="text-blue-400 hover:underline mt-2"
             >
               Manage Expenses
@@ -149,7 +149,7 @@ export default function Page() {
             <h3 className="text-2xl font-semibold mb-4">Total Savings</h3>
             <p className="text-xl">${savings !== null ? savings.toFixed(2) : "N/A"}</p>
             <button
-              onClick={() => router.push("/main/Savings")}
+              onClick={() => router.push("/personal-finance-management/main/Savings")}
               className="text-blue-400 hover:underline mt-2"
             >
               View Savings
