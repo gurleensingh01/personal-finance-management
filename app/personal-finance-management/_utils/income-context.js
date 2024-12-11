@@ -8,19 +8,21 @@ export const IncomeProvider = ({ children }) => {
   const [totalIncome, setTotalIncome] = useState(0);
 
   const addIncome = (income) => {
-    setIncomes((prevIncomes) => [...prevIncomes, income]);
+    setIncomes((prevIncomes) => {
+      const updatedIncomes = [...prevIncomes, income];
+      calculateTotalIncome(updatedIncomes);
+      return updatedIncomes;
+    });
   };
 
-  const editIncome = (index, updatedIncome) => {
-    setIncomes((prevIncomes) =>
-      prevIncomes.map((inc, i) => (i === index ? updatedIncome : inc))
-    );
+  const calculateTotalIncome = (incomeList) => {
+    const total = incomeList.reduce((sum, inc) => sum + parseFloat(inc.amount || 0), 0);
+    setTotalIncome(total);
   };
 
   const updateTotalIncome = () => {
-    const total = incomes.reduce((sum, inc) => sum + parseFloat(inc.amount || 0), 0);
-    setTotalIncome(total);
-    return total;
+    calculateTotalIncome(incomes);
+    return totalIncome;
   };
 
   return (
@@ -29,7 +31,6 @@ export const IncomeProvider = ({ children }) => {
         incomes,
         totalIncome,
         addIncome,
-        editIncome,
         updateTotalIncome,
       }}
     >
