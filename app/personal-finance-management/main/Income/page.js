@@ -1,60 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { useIncome } from "../../_utils/income-context"; // Import Income Context
 
 // Registering necessary Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function IncomePage() {
+  const { addIncome, incomes, updateTotalIncome } = useIncome(); // Access Income Context
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [incomeType, setIncomeType] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState(""); // New state for description
   const [frequency, setFrequency] = useState(""); // State for income frequency
   const [hours, setHours] = useState(""); // State for hours if frequency is "wage"
-  const [incomes, setIncomes] = useState([]);
-  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Function to handle modal open
+  // Update total income whenever incomes change
+  useEffect(() => {
+    updateTotalIncome();
+  }, [incomes, updateTotalIncome]);
+
   const handleAddIncomeClick = () => {
     setIsModalOpen(true);
   };
 
-  // Function to handle modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setIncomeType("");
     setAmount("");
-    setDescription(""); // Reset description when closing modal
+    setDescription("");
     setFrequency("");
     setHours("");
-  };
-
-  const handleTypeChange = (e) => {
-    setIncomeType(e.target.value);
-  };
-
-  const handleAmountChange = (e) => {
-    const value = e.target.value;
-    if (value >= 0) {
-      setAmount(value);
-    } else {
-      alert("Income cannot be negative.");
-    }
-  };
-
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value); // Handle description input
-  };
-
-  const handleFrequencyChange = (e) => {
-    setFrequency(e.target.value);
-  };
-
-  const handleHoursChange = (e) => {
-    setHours(e.target.value);
   };
 
   const handleSaveIncome = () => {
@@ -71,49 +49,44 @@ export default function IncomePage() {
 
       const newIncome = {
         type: incomeType,
-        amount: totalIncome, // Set total income based on frequency logic
-        description: incomeType === "Other" ? description : "", // Include description if it's 'Other'
-        id: Date.now(), // Unique ID based on current timestamp
+        amount: totalIncome,
+        description: incomeType === "Other" ? description : "",
+        id: Date.now(), // Unique ID
       };
-      setIncomes([...incomes, newIncome]); // Add the new income to the list
-      handleCloseModal(); // Close the modal after saving
+
+      addIncome(newIncome); // Persist income data using context
+      handleCloseModal();
     } else {
       alert("Please fill in all fields.");
     }
   };
 
-  // Calculate total amount for each category
   const getTotalByType = (type) => {
     return incomes
       .filter((income) => income.type === type)
       .reduce((total, income) => total + income.amount, 0);
   };
 
-  // Pie chart data
   const pieChartData = {
     labels: ["Job", "Other"],
     datasets: [
       {
-        data: [
-          getTotalByType("Job"),
-          getTotalByType("Other"),
-        ],
-        backgroundColor: ["#48bb78", "#3182ce"], // Colors for the slices
+        data: [getTotalByType("Job"), getTotalByType("Other")],
+        backgroundColor: ["#48bb78", "#3182ce"],
         borderColor: ["#2f855a", "#2b6cb0"],
         borderWidth: 2,
       },
     ],
   };
 
-  // Function to determine the card color based on income type
   const getCardColor = (type) => {
     switch (type) {
       case "Job":
-        return "bg-green-800"; // Green for Job
+        return "bg-green-800";
       case "Other":
-        return "bg-blue-800"; // Blue for Other
+        return "bg-blue-800";
       default:
-        return "bg-gray-800"; // Default for others
+        return "bg-gray-800";
     }
   };
 
@@ -122,41 +95,6 @@ export default function IncomePage() {
       {/* Header */}
       <header className="bg-gray-900 py-4 px-6 w-full shadow-md flex justify-between items-center">
         <h1 className="text-3xl font-semibold">Income</h1>
-        <div className="relative">
-          {/* Hamburger Menu Icon */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="bg-gray-700 px-3 py-2 rounded-md focus:outline-none hover:bg-gray-600"
-          >
-            ☰
-          </button>
-
-          {/* Pop-Up Menu */}
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
-              {/* Profile Option */}
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  router.push("/personal-finance-management/main/Profile");
-                }}
-                className="block px-4 py-2 hover:bg-gray-700"
-              >
-                Profile
-              </button>
-              {/* Logout Option */}
-              <button
-                onClick={() => {
-                  firebaseSignOut();
-                  router.push("/personal-finance-management");
-                }}
-                className="block px-4 py-2 text-red-500 hover:bg-gray-700"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
       </header>
 
       {/* Total Card */}
@@ -179,7 +117,7 @@ export default function IncomePage() {
               className={`${getCardColor(income.type)} text-white p-4 rounded-lg shadow-md`}
             >
               <h3 className="text-xl font-bold mb-2">{income.type}</h3>
-              <p className="text-lg">Amount: ${income.amount}</p>
+              <p className="text-lg">Amount: ${income.amount.toFixed(2)}</p>
               {income.description && <p className="text-md mt-2 break-words">{income.description}</p>}
             </div>
           ))}
@@ -192,10 +130,10 @@ export default function IncomePage() {
             data={pieChartData}
             options={{
               responsive: true,
-              maintainAspectRatio: false, // This allows custom height and width
+              maintainAspectRatio: false,
               plugins: {
                 legend: {
-                  position: 'top', // Position the legend on top of the chart
+                  position: "top",
                 },
               },
             }}
@@ -215,8 +153,6 @@ export default function IncomePage() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white text-black p-6 rounded-lg w-80">
             <h2 className="text-2xl font-bold mb-4">Add Income</h2>
-
-            {/* Income Type Selection */}
             <div className="mb-4">
               <label htmlFor="income-type" className="block text-lg">
                 Select Type:
@@ -224,7 +160,7 @@ export default function IncomePage() {
               <select
                 id="income-type"
                 value={incomeType}
-                onChange={handleTypeChange}
+                onChange={(e) => setIncomeType(e.target.value)}
                 className="w-full mt-2 p-2 border rounded-lg"
               >
                 <option value="">Select...</option>
@@ -232,8 +168,6 @@ export default function IncomePage() {
                 <option value="Other">Other</option>
               </select>
             </div>
-
-            {/* Frequency Input for Job */}
             {incomeType === "Job" && (
               <div className="mb-4">
                 <label htmlFor="frequency" className="block text-lg">
@@ -242,7 +176,7 @@ export default function IncomePage() {
                 <select
                   id="frequency"
                   value={frequency}
-                  onChange={handleFrequencyChange}
+                  onChange={(e) => setFrequency(e.target.value)}
                   className="w-full mt-2 p-2 border rounded-lg"
                 >
                   <option value="">Select...</option>
@@ -252,8 +186,6 @@ export default function IncomePage() {
                 </select>
               </div>
             )}
-
-            {/* Amount Input */}
             <div className="mb-4">
               <label htmlFor="amount" className="block text-lg">
                 Amount:
@@ -262,13 +194,11 @@ export default function IncomePage() {
                 type="number"
                 id="amount"
                 value={amount}
-                onChange={handleAmountChange}
+                onChange={(e) => setAmount(e.target.value)}
                 className="w-full mt-2 p-2 border rounded-lg"
                 placeholder="Enter amount"
               />
             </div>
-
-            {/* Hours Input for Wage Frequency */}
             {frequency === "wage" && (
               <div className="mb-4">
                 <label htmlFor="hours" className="block text-lg">
@@ -278,14 +208,12 @@ export default function IncomePage() {
                   type="number"
                   id="hours"
                   value={hours}
-                  onChange={handleHoursChange}
+                  onChange={(e) => setHours(e.target.value)}
                   className="w-full mt-2 p-2 border rounded-lg"
                   placeholder="Enter hours"
                 />
               </div>
             )}
-
-            {/* Description Input for 'Other' income type */}
             {incomeType === "Other" && (
               <div className="mb-4">
                 <label htmlFor="description" className="block text-lg">
@@ -294,13 +222,12 @@ export default function IncomePage() {
                 <textarea
                   id="description"
                   value={description}
-                  onChange={handleDescriptionChange}
+                  onChange={(e) => setDescription(e.target.value)}
                   className="w-full mt-2 p-2 border rounded-lg"
                   placeholder="Enter a description"
-                />
+                ></textarea>
               </div>
             )}
-
             <div className="flex justify-between">
               <button
                 onClick={handleCloseModal}

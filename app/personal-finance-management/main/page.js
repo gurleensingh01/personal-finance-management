@@ -2,6 +2,8 @@
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useUserAuth } from "../_utils/auth-context.js";
+import { useInvestment } from "../_utils/investment-context"; // Investment context
+import { useIncome } from "../_utils/income-context"; // Income context
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -9,17 +11,12 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Page() {
   const { user, firebaseSignOut } = useUserAuth();
+  const { updateTotalInvestment, totalInvestment } = useInvestment(); // Investment data
+  const { updateTotalIncome, totalIncome } = useIncome(); // Income data
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false); // State to control the hamburger menu
-  const [income, setIncome] = useState(123);
-  const [expenses, setExpenses] = useState(58);
-  const [savings, setSavings] = useState(65);
-  const [investments, setInvestments] = useState(0); // Auto-calculated based on categories
-  const [stocks, setStocks] = useState(20);
-  const [bonds, setBonds] = useState(10);
-  const [mutualFunds, setMutualFunds] = useState(10);
-  const [crypto, setCrypto] = useState(5);
-  const [realEstate, setRealEstate] = useState(30);
+  const [expenses, setExpenses] = useState(0); // Placeholder for expenses
+  const [savings, setSavings] = useState(0); // Placeholder for savings
 
   // Redirect unauthenticated users to the login page
   useEffect(() => {
@@ -28,17 +25,22 @@ export default function Page() {
     }
   }, [user, router]);
 
-  // Automatically calculate total investments
+  // Fetch total investments dynamically
   useEffect(() => {
-    setInvestments(stocks + bonds + mutualFunds + crypto + realEstate);
-  }, [stocks, bonds, mutualFunds, crypto, realEstate]);
+    updateTotalInvestment(); // Updates the total investment whenever called
+  }, [updateTotalInvestment]);
+
+  // Fetch total income dynamically
+  useEffect(() => {
+    updateTotalIncome(); // Updates the total income whenever called
+  }, [updateTotalIncome]);
 
   // Data for Pie Charts
   const incomeVsExpensesData = {
     labels: ["Income", "Expenses"],
     datasets: [
       {
-        data: [income || 0, expenses || 0],
+        data: [totalIncome || 0, expenses || 0],
         backgroundColor: ["#4caf50", "#f44336"],
         hoverBackgroundColor: ["#66bb6a", "#e57373"],
       },
@@ -49,20 +51,9 @@ export default function Page() {
     labels: ["Savings", "Expenses", "Investments"],
     datasets: [
       {
-        data: [savings || 0, expenses || 0, investments || 0],
+        data: [savings || 0, expenses || 0, totalInvestment || 0],
         backgroundColor: ["#2196f3", "#ff9800", "#9c27b0"],
         hoverBackgroundColor: ["#42a5f5", "#ffb74d", "#ba68c8"],
-      },
-    ],
-  };
-
-  const investmentBreakdownData = {
-    labels: ["Stocks", "Bonds", "Mutual Funds", "Crypto", "Real Estate"],
-    datasets: [
-      {
-        data: [stocks || 0, bonds || 0, mutualFunds || 0, crypto || 0, realEstate || 0],
-        backgroundColor: ["#ffeb3b", "#4caf50", "#2196f3", "#9c27b0", "#f44336"],
-        hoverBackgroundColor: ["#ffee58", "#66bb6a", "#42a5f5", "#ba68c8", "#e57373"],
       },
     ],
   };
@@ -123,7 +114,7 @@ export default function Page() {
           {/* Total Income */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Income</h3>
-            <p className="text-xl">${income !== null ? income.toFixed(2) : "N/A"}</p>
+            <p className="text-xl">${totalIncome.toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Income")}
               className="text-blue-400 hover:underline mt-2"
@@ -135,7 +126,7 @@ export default function Page() {
           {/* Total Expenses */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Expenses</h3>
-            <p className="text-xl">${expenses !== null ? expenses.toFixed(2) : "N/A"}</p>
+            <p className="text-xl">${expenses.toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Expenses")}
               className="text-blue-400 hover:underline mt-2"
@@ -147,7 +138,7 @@ export default function Page() {
           {/* Total Savings */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Savings</h3>
-            <p className="text-xl">${savings !== null ? savings.toFixed(2) : "N/A"}</p>
+            <p className="text-xl">${savings.toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Savings")}
               className="text-blue-400 hover:underline mt-2"
@@ -159,7 +150,7 @@ export default function Page() {
           {/* Investments */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Investments</h3>
-            <p className="text-xl">${investments !== null ? investments.toFixed(2) : "N/A"}</p>
+            <p className="text-xl">${totalInvestment.toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Investments")}
               className="text-blue-400 hover:underline mt-2"
@@ -183,12 +174,6 @@ export default function Page() {
             <div className="bg-gray-700 p-6 rounded-lg shadow-lg text-center">
               <h4 className="text-2xl mb-4">Savings Distribution</h4>
               <Pie data={savingsDistributionData} />
-            </div>
-
-            {/* Investment Breakdown Pie Chart */}
-            <div className="bg-gray-700 p-6 rounded-lg shadow-lg text-center">
-              <h4 className="text-2xl mb-4">Investment Breakdown</h4>
-              <Pie data={investmentBreakdownData} />
             </div>
           </div>
         </section>
