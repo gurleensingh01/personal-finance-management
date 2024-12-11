@@ -11,10 +11,15 @@ export default function Page() {
   const { user, firebaseSignOut } = useUserAuth();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false); // State to control the hamburger menu
-  const [income, setIncome] = useState(null);
-  const [expenses, setExpenses] = useState(null);
-  const [savings, setSavings] = useState(null);
-  const investments = null; // No initial values
+  const [income, setIncome] = useState(123);
+  const [expenses, setExpenses] = useState(58);
+  const [savings, setSavings] = useState(65);
+  const [investments, setInvestments] = useState(0); // Auto-calculated based on categories
+  const [stocks, setStocks] = useState(20);
+  const [bonds, setBonds] = useState(10);
+  const [mutualFunds, setMutualFunds] = useState(10);
+  const [crypto, setCrypto] = useState(5);
+  const [realEstate, setRealEstate] = useState(30);
 
   // Redirect unauthenticated users to the login page
   useEffect(() => {
@@ -22,6 +27,11 @@ export default function Page() {
       router.push("/personal-finance-management");
     }
   }, [user, router]);
+
+  // Automatically calculate total investments
+  useEffect(() => {
+    setInvestments(stocks + bonds + mutualFunds + crypto + realEstate);
+  }, [stocks, bonds, mutualFunds, crypto, realEstate]);
 
   // Data for Pie Charts
   const incomeVsExpensesData = {
@@ -47,12 +57,12 @@ export default function Page() {
   };
 
   const investmentBreakdownData = {
-    labels: ["Investments"],
+    labels: ["Stocks", "Bonds", "Mutual Funds", "Crypto", "Real Estate"],
     datasets: [
       {
-        data: [investments || 0],
-        backgroundColor: ["#ffeb3b"],
-        hoverBackgroundColor: ["#ffee58"],
+        data: [stocks || 0, bonds || 0, mutualFunds || 0, crypto || 0, realEstate || 0],
+        backgroundColor: ["#ffeb3b", "#4caf50", "#2196f3", "#9c27b0", "#f44336"],
+        hoverBackgroundColor: ["#ffee58", "#66bb6a", "#42a5f5", "#ba68c8", "#e57373"],
       },
     ],
   };
@@ -115,7 +125,7 @@ export default function Page() {
             <h3 className="text-2xl font-semibold mb-4">Total Income</h3>
             <p className="text-xl">${income !== null ? income.toFixed(2) : "N/A"}</p>
             <button
-              onClick={() => router.push("/main/Income")}
+              onClick={() => router.push("/personal-finance-management/main/Income")}
               className="text-blue-400 hover:underline mt-2"
             >
               Manage Income
@@ -151,7 +161,7 @@ export default function Page() {
             <h3 className="text-2xl font-semibold mb-4">Investments</h3>
             <p className="text-xl">${investments !== null ? investments.toFixed(2) : "N/A"}</p>
             <button
-              onClick={() => router.push("/main/Investments")}
+              onClick={() => router.push("/personal-finance-management/main/Investments")}
               className="text-blue-400 hover:underline mt-2"
             >
               Manage Investments
