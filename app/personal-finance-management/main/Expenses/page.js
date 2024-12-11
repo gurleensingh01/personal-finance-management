@@ -1,20 +1,15 @@
 "use client";
  
 import { useState } from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
- 
-// Registering necessary Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend);
- 
+
 export default function ExpensesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseType, setExpenseType] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState(""); // New state for description
   const [expenses, setExpenses] = useState([]);
-  const [menuOpen, setMenuOpen] = useState(false);
- 
+  const [menuOpen, setMenuOpen] = useState(false); 
+
   // Function to handle modal open
   const handleAddExpenseClick = () => {
     setIsModalOpen(true);
@@ -61,24 +56,7 @@ export default function ExpensesPage() {
       .filter((expense) => expense.type === type)
       .reduce((total, expense) => total + expense.amount, 0);
   };
- 
-  // Pie chart data
-  const pieChartData = {
-    labels: ["Essential", "Leisure", "Others"],
-    datasets: [
-      {
-        data: [
-          getTotalByType("Essential"),
-          getTotalByType("Leisure"),
-          getTotalByType("Others"),
-        ],
-        backgroundColor: ["#48bb78", "#3182ce", "#e6e600"], // Colors for the slices
-        borderColor: ["#2f855a", "#2b6cb0", "#b3b300"],
-        borderWidth: 2,
-      },
-    ],
-  };
- 
+
   // Function to determine the card color based on expense type
   const getCardColor = (type) => {
     switch (type) {
@@ -134,54 +112,49 @@ export default function ExpensesPage() {
           )}
         </div>
       </header>
- 
-      {/* Total Card */}
-      <div className="mt-6 w-2/3 gap-6">
-        <div className={`${getCardColor("Total")} text-white p-8 rounded-3xl shadow-md`}>
-          <h3 className="text-3xl font-bold mb-2 text-center">Total Expenses</h3>
-          <p className="text-lg text-center">
-            ${getTotalByType("Essential") + getTotalByType("Leisure") + getTotalByType("Others")}
-          </p>
+
+        {/* Group heading and fixed cards together */}
+        <div className="m-auto text-center mt-6 mb-8">
+        {/* Fixed cards for Wants, Needs, and Others */}
+        <div className="mt-6 w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className={`${getCardColor("Want")} text-white p-8 rounded-3xl shadow-md`}>
+            <h3 className="text-3xl font-bold mb-2">Wants</h3>
+            <p className="text-lg">
+              Total: ${getTotalByType("Want").toFixed(2)}
+            </p>
+          </div>
+          <div className={`${getCardColor("Need")} text-white p-8 rounded-3xl shadow-md`}>
+            <h3 className="text-3xl font-bold mb-2">Needs</h3>
+            <p className="text-lg">
+              Total: ${getTotalByType("Need").toFixed(2)}
+            </p>
+          </div>
+          <div className={`${getCardColor("Others")} text-white p-8 rounded-3xl shadow-md`}>
+            <h3 className="text-3xl font-bold mb-2">Others</h3>
+            <p className="text-lg">
+              Total: ${getTotalByType("Others").toFixed(2)}
+            </p>
+          </div>
         </div>
       </div>
- 
-      {/* Main Content with Cards and Pie Chart */}
-      <div className="mt-6 w-full flex flex-col lg:flex-row items-center lg:items-start lg:justify-center gap-8">
-        {/* Expense Cards */}
-        <div className="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 m-10 lg:grid-cols-3 gap-6 text-center">
-          {expenses.map((expense) => (
-            <div
-              key={expense.id}
-              className={`${getCardColor(expense.type)} text-white p-4 rounded-lg shadow-md`}
-            >
-              <h3 className="text-xl font-bold mb-2">{expense.type}</h3>
-              <p className="text-lg">Amount: ${expense.amount}</p>
-              {/* Truncate description to 30 characters */}
-              <p className="text-md mt-2 break-words">
-                {expense.description.length > 20
-                  ? `${expense.description.slice(0, 20)}...`
-                  : expense.description}
-              </p>
-            </div>
-          ))}
-        </div>
- 
-        {/* Pie Chart */}
-        <div className="lg:w-1/3 h-96">
-          <h2 className="text-2xl font-bold text-center mb-4">Expenses by Category</h2>
-          <Pie
-            data={pieChartData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false, // This allows custom height and width
-              plugins: {
-                legend: {
-                  position: 'top', // Position the legend on top of the chart
-                },
-              },
-            }}
-          />
-        </div>
+
+      {/* Display Expenses with full-width grid */}
+      <div className="mt-8 w-2/3 px-4 sm:px-8 lg:px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 text-center">
+        {expenses.map((expense) => (
+          <div
+            key={expense.id}
+            className={`${getCardColor(expense.type)} text-white p-4 rounded-lg shadow-md`}
+          >
+            <h3 className="text-xl font-bold mb-2">{expense.type}</h3>
+            <p className="text-lg">Amount: ${expense.amount}</p>
+            {/* Truncate description to 30 characters */}
+            <p className="text-md mt-2 break-words">
+              {expense.description.length > 20
+                ? `${expense.description.slice(0, 20)}...`
+                : expense.description}
+            </p>
+          </div>
+        ))}
       </div>
  
       <button
@@ -262,6 +235,5 @@ export default function ExpensesPage() {
         </div>
       )}
     </div>
- 
-      );
+  );
 }
