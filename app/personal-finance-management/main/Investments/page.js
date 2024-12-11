@@ -1,13 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useInvestment } from "../../_utils/investment-context"; // Import shared context
 
 export default function InvestmentsPage() {
-  const [investments, setInvestments] = useState([]);
+  const { investments, addInvestment, editInvestment, updateTotalInvestment } =
+    useInvestment(); // Access shared context
   const [currentInvestment, setCurrentInvestment] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const [investmentType, setInvestmentType] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false); 
 
   const investmentFields = {
     Stocks: ["Stock Name", "Quantity", "Price Per Unit", "Market Value (Optional)"],
@@ -16,6 +19,15 @@ export default function InvestmentsPage() {
     Crypto: ["Name", "Price Per Unit", "Quantity", "Market Value (Optional)"],
     "Real Estate": ["Type", "Invested Amount", "Market Value (Optional)"],
   };
+
+  // Calculate Total Investments and Update Shared Context
+  useEffect(() => {
+    const total = investments.reduce(
+      (sum, inv) => sum + parseFloat(inv["Invested Amount"] || inv["Total Amount"] || 0),
+      0
+    );
+    updateTotalInvestment(total); // Update the shared state
+  }, [investments, updateTotalInvestment]);
 
   const handleAddClick = (type) => {
     setInvestmentType(type);
@@ -98,11 +110,9 @@ export default function InvestmentsPage() {
 
   const saveInvestment = () => {
     if (editMode) {
-      const updatedInvestments = [...investments];
-      updatedInvestments[editIndex] = currentInvestment;
-      setInvestments(updatedInvestments);
+      editInvestment(editIndex, currentInvestment);
     } else {
-      setInvestments([...investments, currentInvestment]);
+      addInvestment(currentInvestment);
     }
     closePopup();
   };
@@ -115,24 +125,53 @@ export default function InvestmentsPage() {
     setEditIndex(null);
   };
 
-  const getTotalInvestment = () =>
-    investments.reduce((total, inv) => {
-      const amount = parseFloat(inv["Invested Amount"] || inv["Total Amount"] || 0);
-      return total + amount;
-    }, 0);
-
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-800 to-black text-white font-serif">
+    <div className="flex flex-col items-center h-screen bg-gradient-to-br from-gray-800 to-black text-white font-serif">
       {/* Header */}
-      <header className="bg-gray-900 py-4 px-6 shadow-md">
-        <h1 className="text-3xl font-semibold">Investments</h1>
+      <header className="bg-gray-900 py-4 px-6 w-full shadow-md flex justify-between items-center">
+        <h1 className="text-3xl font-semibold">Investment</h1>
+        <div className="relative">
+          {/* Hamburger Menu Icon */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="bg-gray-700 px-3 py-2 rounded-md focus:outline-none hover:bg-gray-600"
+          >
+            ☰
+          </button>
+ 
+          {/* Pop-Up Menu */}
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+              {/* Profile Option */}
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  router.push("/personal-finance-management/main/Profile");
+                }}
+                className="block px-4 py-2 hover:bg-gray-700"
+              >
+                Profile
+              </button>
+              {/* Logout Option */}
+              <button
+                onClick={() => {
+                  firebaseSignOut();
+                  router.push("/personal-finance-management");
+                }}
+                className="block px-4 py-2 text-red-500 hover:bg-gray-700"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Total Investments Summary */}
       <div className="container mx-auto py-6">
         <div className="bg-gray-700 p-6 rounded-lg shadow-lg text-center">
           <h2 className="text-2xl font-bold">Total Investments</h2>
-          <p className="text-xl mt-2">${getTotalInvestment().toFixed(2)}</p>
+          <p className="text-xl mt-2">${investments.reduce((sum, inv) => sum + parseFloat(inv["Invested Amount"] || inv["Total Amount"] || 0), 0).toFixed(2)}</p>
         </div>
       </div>
 
