@@ -1,11 +1,12 @@
 "use client";
+
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useUserAuth } from "../_utils/auth-context.js";
-import { useInvestment } from "../_utils/investment-context"; // Investment context
-import { useIncome } from "../_utils/income-context"; // Income context
-import { useExpenses } from "../_utils/expenses-context"; // Expenses context
-import { useSavings } from "../_utils/savings-context"; // Savings context
+import { useInvestment } from "../_utils/investment-context";
+import { useIncome } from "../_utils/income-context";
+import { useExpenses } from "../_utils/expenses-context";
+import { useSavings } from "../_utils/savings-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -13,10 +14,10 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function Page() {
   const { user, firebaseSignOut } = useUserAuth();
-  const { updateTotalInvestment, totalInvestment } = useInvestment(); // Investment data
-  const { updateTotalIncome, totalIncome } = useIncome(); // Income data
-  const { updateTotalExpenses, totalExpenses } = useExpenses(); // Expenses data
-  const { updateTotalSavings, totalSavings } = useSavings(); // Savings data
+  const { updateTotalInvestment, totalInvestment } = useInvestment();
+  const { updateTotalIncome, totalIncome } = useIncome();
+  const { updateTotalExpenses, totalExpenses } = useExpenses();
+  const { updateTotalSavings, totalSavings } = useSavings();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -29,10 +30,11 @@ export default function Page() {
 
   // Fetch dynamic data
   useEffect(() => {
-    updateTotalInvestment(); // Updates the total investment
-    updateTotalIncome(); // Updates the total income
-    updateTotalExpenses(); // Updates the total expenses
-  }, [updateTotalInvestment, updateTotalIncome, updateTotalExpenses]);
+    updateTotalInvestment();
+    updateTotalIncome();
+    updateTotalExpenses();
+    updateTotalSavings(); // ✅ Added missing update function
+  }, [updateTotalInvestment, updateTotalIncome, updateTotalExpenses, updateTotalSavings]);
 
   // Data for Pie Charts
   const incomeVsExpensesData = {
@@ -113,7 +115,7 @@ export default function Page() {
           {/* Total Income */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Income</h3>
-            <p className="text-xl">${totalIncome.toFixed(2)}</p>
+            <p className="text-xl">${(totalIncome || 0).toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Income")}
               className="text-blue-400 hover:underline mt-2"
@@ -125,7 +127,7 @@ export default function Page() {
           {/* Total Expenses */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Expenses</h3>
-            <p className="text-xl">${totalExpenses.toFixed(2)}</p>
+            <p className="text-xl">${(totalExpenses || 0).toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Expenses")}
               className="text-blue-400 hover:underline mt-2"
@@ -137,7 +139,7 @@ export default function Page() {
           {/* Total Savings */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Total Savings</h3>
-            <p className="text-xl">${totalSavings.toFixed(2)}</p>
+            <p className="text-xl">${(totalSavings || 0).toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Savings")}
               className="text-blue-400 hover:underline mt-2"
@@ -149,7 +151,7 @@ export default function Page() {
           {/* Investments */}
           <div className="bg-gray-700 p-6 rounded-lg shadow-lg">
             <h3 className="text-2xl font-semibold mb-4">Investments</h3>
-            <p className="text-xl">${totalInvestment.toFixed(2)}</p>
+            <p className="text-xl">${(totalInvestment || 0).toFixed(2)}</p>
             <button
               onClick={() => router.push("/personal-finance-management/main/Investments")}
               className="text-blue-400 hover:underline mt-2"
@@ -176,7 +178,6 @@ export default function Page() {
             </div>
           </div>
         </section>
-
       </main>
     </div>
   );

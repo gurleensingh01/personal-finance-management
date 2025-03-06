@@ -1,51 +1,80 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { db } from "../_utils/firebase";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 // Create Expenses Context
 const ExpensesContext = createContext();
 
-// Expenses Provider Component
-export const ExpensesProvider = ({ children }) => {
+export const ExpensesProvider = ({ children, userId }) => {
   const [expenses, setExpenses] = useState([]);
-  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0); // Added state for total expenses
 
-  // Function to add a new expense
-  const addExpense = (expense) => {
-    setExpenses((prevExpenses) => [...prevExpenses, expense]);
+  // Fetch expenses from Firestore when the component mounts
+  useEffect(() => {
+    if (userId) fetchExpenses();
+  }, [userId]);
+
+  const fetchExpenses = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, `users/${userId}/expenses`));
+      const fetchedExpenses = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setExpenses(fetchedExpenses);
+      updateTotalExpenses(fetchedExpenses); // Update total expenses after fetching
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    }
   };
 
-  // Function to update an existing expense
-  const editExpense = (index, updatedExpense) => {
-    setExpenses((prevExpenses) =>
-      prevExpenses.map((exp, i) => (i === index ? updatedExpense : exp))
-    );
+  // Add expense to Firestore
+  const addExpense = async (expense) => {
+    try {
+      const docRef = await addDoc(collection(db, `users/${userId}/expenses`), expense);
+      const newExpenses = [...expenses, { id: docRef.id, ...expense }];
+      setExpenses(newExpenses);
+      updateTotalExpenses(newExpenses); // Update total expenses after adding
+    } catch (error) {
+      console.error("Error adding expense:", error);
+    }
   };
 
-  // Function to calculate and update the total expenses
-  const updateTotalExpenses = () => {
-    const total = expenses.reduce(
-      (sum, exp) => sum + parseFloat(exp.amount || 0),
+  // Delete expense from Firestore
+  const deleteExpense = async (expenseId) => {
+    try {
+      await deleteDoc(doc(db, `users/${userId}/expenses`, expenseId));
+      const updatedExpenses = expenses.filter((expense) => expense.id !== expenseId);
+      setExpenses(updatedExpenses);
+      updateTotalExpenses(updatedExpenses); // Update total expenses after deleting
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+    }
+  };
+
+  // Properly updates total expenses in state
+  const updateTotalExpenses = (expensesData = expenses) => {
+    const total = expensesData.reduce(
+      (sum, expense) => sum + (parseFloat(expense.amount) || 0),
       0
     );
-    setTotalExpenses(total);
-    return total;
+    setTotalExpenses(total); // Set total expenses in state
   };
 
   return (
-    <ExpensesContext.Provider
-      value={{
-        expenses,
-        totalExpenses,
-        addExpense,
-        editExpense,
-        updateTotalExpenses,
-      }}
-    >
+    <ExpensesContext.Provider value={{ expenses, totalExpenses, addExpense, deleteExpense, updateTotalExpenses }}>
       {children}
     </ExpensesContext.Provider>
   );
 };
 
-// Custom hook to use the Expenses Context
+// Custom hook for using expenses context
 export const useExpenses = () => useContext(ExpensesContext);
